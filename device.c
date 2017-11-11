@@ -236,3 +236,40 @@ void device_reset(struct device_settings * p_chip){
 	device_deinit_chip(p_chip);
 	device_init_chip(p_chip);
 }
+
+void device_show_registers(struct device_settings * const p_chip){
+	static const int N_COLUMNS 	= 4;
+	static const int COL_W 		= 10;
+	static const int COL_H 		= TOTAL_REGISTERS / N_COLUMNS;
+
+	for(int c = 0; c < N_COLUMNS; c++){
+		printf("| %*s | %*s ", COL_W, "Reg", COL_W, "Contents");
+	}
+	printf("|\n");
+	for(int c = 0; c < N_COLUMNS*2; c++){
+		printf("|------------");
+	}
+	printf("|\n");
+
+	int reg = 0;
+	while(reg < COL_H){
+		for(int c = 0; c < N_COLUMNS; c++){
+			printf("| %*X | %*X ", COL_W, reg + (c * COL_H), COL_W, p_chip->registers[reg + (c * COL_H)]);
+		}
+		reg++;
+		printf("|\n");
+	}
+	for(int c = 0; c < N_COLUMNS*2; c++){
+		printf("|------------");
+	}
+	printf("|\n");
+}
+
+
+
+
+
+
+
+
+

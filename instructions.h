@@ -1,13 +1,16 @@
 #ifndef _INSTRUCTIONS_H
 #define _INSTRUCTIONS_H
 
+#include "device.h"
+
+#define INSTRUCTION_ARGS struct device_settings* const p_chip, const int op1, const int op2
 /**
  * @brief      The instructions each have a name and what to do when it occurs.
  */
 struct instruction{
 	char* 	name;
 	int 	num_operands;
-	void 	(*perform)(const int operand1, const int operand2);
+	void 	(*perform)(INSTRUCTION_ARGS);
 };
 
 /**
@@ -16,7 +19,11 @@ struct instruction{
  * @param[in]  op1   The operand 1
  * @param[in]  op2   The operand 2
  */
-void instruction_test_perform(const int op1, const int op2);
+void instruction_test(INSTRUCTION_ARGS);
+void instruction_nop(INSTRUCTION_ARGS);
+void instruction_movf(INSTRUCTION_ARGS);
+void instruction_movwf(INSTRUCTION_ARGS);
+void instruction_movlw(INSTRUCTION_ARGS);
 
 
 #endif

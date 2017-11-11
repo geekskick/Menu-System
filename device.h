@@ -39,6 +39,7 @@ struct device_settings{
 	int* 	current_pin_functions;
 	uint8_t registers[TOTAL_REGISTERS];
 	map_t	memory_map;
+	uint8_t w_reg;
 };
 
 /**
@@ -81,4 +82,5 @@ void device_make_function_available(struct device_settings *const p_chip, const 
 void device_make_function_unavailable(struct device_settings *const p_chip, const int pin, const enum pin_function function);
 void device_toggle_function_availability(struct device_settings *const p_chip, const int pin, const enum pin_function function);
 void device_reconfigure(struct device_settings * const p_chip);
+void device_show_registers(struct device_settings * const p_chip);
 #endif

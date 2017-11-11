@@ -50,42 +50,42 @@ void asm_run(void *p){
 void asm_mnemonics_map_populate(map_t *p_map){
 
 	const struct instruction MNEMONICS[] = { 
-		{ "ADDWF", 	2, instruction_test_perform }, 
-		{ "ANDWF", 	2, instruction_test_perform }, 
-		{ "CLRF", 	1, instruction_test_perform }, 
-		{ "CLRW", 	0, instruction_test_perform }, 
-		{ "COMF", 	2, instruction_test_perform },
-		{ "DECF", 	2, instruction_test_perform },
-		{ "DECFSZ", 2, instruction_test_perform },
-		{ "INCF", 	2, instruction_test_perform },
-		{ "INCFSZ", 2, instruction_test_perform },
-		{ "IORWF", 	2, instruction_test_perform },
-		{ "MOVF", 	2, instruction_test_perform },
-		{ "MOVWF", 	1, instruction_test_perform },
-		{ "NOP", 	0, instruction_test_perform },
-		{ "RLF", 	2, instruction_test_perform },
-		{ "RRF", 	2, instruction_test_perform },
-		{ "SUBWF", 	2, instruction_test_perform },
-		{ "SWAPF", 	2, instruction_test_perform },
-		{ "XORWF", 	2, instruction_test_perform },
-		{ "COMF", 	2, instruction_test_perform },
-		{ "BCF", 	2, instruction_test_perform },
-		{ "BSF", 	2, instruction_test_perform },
-		{ "BTFSC", 	2, instruction_test_perform },
-		{ "BTFSS", 	2, instruction_test_perform },
-		{ "ANDLW", 	1, instruction_test_perform },
-		{ "ADDLW", 	1, instruction_test_perform },
-		{ "CALL", 	1, instruction_test_perform },
-		{ "CLRWDT", 0, instruction_test_perform },
-		{ "GOTO", 	1, instruction_test_perform },
-		{ "IORLW", 	1, instruction_test_perform },
-		{ "MOVLW", 	1, instruction_test_perform },
-		{ "RETFIE", 0, instruction_test_perform },
-		{ "RETLW", 	1, instruction_test_perform },
-		{ "RETURN", 0, instruction_test_perform },
-		{ "SLEEP", 	0, instruction_test_perform },
-		{ "SUBLW", 	1, instruction_test_perform },
-		{ "XORLW", 	1, instruction_test_perform }
+		{ "ADDWF", 	2, instruction_test }, 
+		{ "ANDWF", 	2, instruction_test }, 
+		{ "CLRF", 	1, instruction_test }, 
+		{ "CLRW", 	0, instruction_test }, 
+		{ "COMF", 	2, instruction_test },
+		{ "DECF", 	2, instruction_test },
+		{ "DECFSZ", 2, instruction_test },
+		{ "INCF", 	2, instruction_test },
+		{ "INCFSZ", 2, instruction_test },
+		{ "IORWF", 	2, instruction_test },
+		{ "MOVF", 	2, instruction_movf },
+		{ "MOVWF", 	1, instruction_movwf },
+		{ "NOP", 	0, instruction_nop },
+		{ "RLF", 	2, instruction_test },
+		{ "RRF", 	2, instruction_test },
+		{ "SUBWF", 	2, instruction_test },
+		{ "SWAPF", 	2, instruction_test },
+		{ "XORWF", 	2, instruction_test },
+		{ "COMF", 	2, instruction_test },
+		{ "BCF", 	2, instruction_test },
+		{ "BSF", 	2, instruction_test },
+		{ "BTFSC", 	2, instruction_test },
+		{ "BTFSS", 	2, instruction_test },
+		{ "ANDLW", 	1, instruction_test },
+		{ "ADDLW", 	1, instruction_test },
+		{ "CALL", 	1, instruction_test },
+		{ "CLRWDT", 0, instruction_test },
+		{ "GOTO", 	1, instruction_test },
+		{ "IORLW", 	1, instruction_test },
+		{ "MOVLW", 	1, instruction_movlw },
+		{ "RETFIE", 0, instruction_test },
+		{ "RETLW", 	1, instruction_test },
+		{ "RETURN", 0, instruction_test },
+		{ "SLEEP", 	0, instruction_test },
+		{ "SUBLW", 	1, instruction_test },
+		{ "XORLW", 	1, instruction_test }
 	};
 
 	for(int i = 0; i < (sizeof(MNEMONICS)/sizeof(*MNEMONICS)); i++){
@@ -135,30 +135,41 @@ int asm_get_op(const char * const op, map_t h_map){
  */
 void asm_run_handler(const char input, struct asm_args * const p_self){
 	
-	char 				*p_line 	= p_self->p_file->file_contents[p_self->p_file->current_line];
-	struct instruction 	*map_out;
-	static char 		temp_str[ASM_FILENAME_LEN];
-	strcpy(temp_str, p_line);
-
-	char 				*mnemonic 	= strtok(temp_str, 	MNEMONIC_SEPERATOR);
-	char 				*op1 		= strtok(NULL, 		OP_SEPERATOR);
-	char 				*op2	 	= strtok(NULL, 		OP_SEPERATOR);
-	//int 				operand_num = asm_get_op_count(op1, op2);
-
-	printf("[%s][%s][%s]\n", mnemonic, op1, op2);
-
-	// no mnemonic found
-	if(NULL == mnemonic){ return; }
-	if(MAP_OK != hashmap_get(p_self->mnemonic_map, mnemonic, (void**)&map_out)){
-		// not in map not sure what i want it to do here, so for now just ignore it.
+	if(input == ASM_SCROLLER_DEBUG_KEY){
+		menu_cls();
+		device_show_registers(p_self->p_device);
+		// block to prevent the menu from being displayed again
+		getch();
 	}
-	else{
-		int op1_int = asm_get_op(op1, p_self->p_device->memory_map);
-		int op2_int = asm_get_op(op2, p_self->p_device->memory_map);
-		map_out->perform(op1_int, op2_int);
+	else if (input == ASM_SCROLLER_RUN_KEY){
+		char 				*p_line 	= p_self->p_file->file_contents[p_self->p_file->current_line];
+		struct instruction 	*map_out;
+		static char 		temp_str[ASM_FILENAME_LEN];
+		strcpy(temp_str, p_line);
+
+		char 				*mnemonic 	= strtok(temp_str, 	MNEMONIC_SEPERATOR);
+		char 				*op1 		= strtok(NULL, 		OP_SEPERATOR);
+		char 				*op2	 	= strtok(NULL, 		OP_SEPERATOR);
+		//int 				operand_num = asm_get_op_count(op1, op2);
+
+		printf("[%s][%s][%s]\n", mnemonic, op1, op2);
+
+		// no mnemonic found
+		if(NULL == mnemonic){ return; }
+		if(MAP_OK != hashmap_get(p_self->mnemonic_map, mnemonic, (void**)&map_out)){
+			// not in map not sure what i want it to do here, so for now just ignore it.
+		}
+		else{
+			int op1_int = asm_get_op(op1, p_self->p_device->memory_map);
+			int op2_int = asm_get_op(op2, p_self->p_device->memory_map);
+
+			printf("Performing: %s with ops [%d][%d]\n", mnemonic, op1_int, op2_int);
+			map_out->perform(p_self->p_device, op1_int, op2_int);
+		}
+
+		memset(temp_str, 0, ASM_FILENAME_LEN * sizeof(*temp_str));
 	}
 
-	memset(temp_str, 0, ASM_FILENAME_LEN * sizeof(*temp_str));
 }
 
 /**
@@ -186,7 +197,7 @@ void show_asm(void* p){
 		if(start_line < 0){ start_line = 0; }
 
 		// Header Line
-		printf("File:%s\tTotal Lines:%d\tCurrent Line:%d\t'%c' to quit\n", p_loaded_file->file_name, p_loaded_file->max_lines, p_loaded_file->current_line+1, ASM_SCROLLER_QUIT_KEY);
+		printf("File:%s\tTotal Lines:%d\tCurrent Line:%d\t'%c' to quit\t'%c' to debug\t'%c' to run instruction\n", p_loaded_file->file_name, p_loaded_file->max_lines, p_loaded_file->current_line+1, ASM_SCROLLER_QUIT_KEY, ASM_SCROLLER_DEBUG_KEY, ASM_SCROLLER_RUN_KEY);
 
 
 		for(int display_line = 0; display_line < rows && start_line < p_loaded_file->max_lines; display_line++, start_line++){

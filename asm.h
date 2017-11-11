@@ -15,6 +15,8 @@
  * The key to press which will stop the file viewer
  */
 #define	ASM_SCROLLER_QUIT_KEY 	'q'
+#define ASM_SCROLLER_DEBUG_KEY	'd'
+#define ASM_SCROLLER_RUN_KEY	'r'
 
 struct asm_args;
 /**

@@ -128,16 +128,15 @@ void menu_clear_bridge(void*p){
  * @param      p     not used
  */
 void hash_test(void *p){
-	(void)p; //silince warnings
 	map_t 	h_map = hashmap_new();
 	assert(h_map);
 
 	const struct instruction MNEMONICS[] = { 
-		{ "MOV", 2, instruction_test_perform }, 
-		{ "LDR", 2, instruction_test_perform }, 
-		{ "STO", 2, instruction_test_perform }, 
-		{ "PSH", 2, instruction_test_perform }, 
-		{ "POP", 2, instruction_test_perform } 
+		{ "MOV", 2, instruction_test }, 
+		{ "LDR", 2, instruction_test }, 
+		{ "STO", 2, instruction_test }, 
+		{ "PSH", 2, instruction_test }, 
+		{ "POP", 2, instruction_test } 
 	};
 
 	for(int i = 0; i < 5; i++){
@@ -151,7 +150,7 @@ void hash_test(void *p){
 		int rc = hashmap_get(h_map, MNEMONICS[i].name, (void**)&p_out);
 		printf("[%d] map queried with %s\n", i, MNEMONICS[i].name);
 		printf("[%d] %s = ", rc, p_out->name);
-		p_out->perform(i, i);
+		p_out->perform(((struct device_settings*)p), i, i);
 	}
 		
 	hashmap_free(h_map);
@@ -165,6 +164,7 @@ int main(const int argc, const char ** argv){
 		{"Exit", 				menu_quit 				},
 		{"Show Device", 		print_chip_bridge		},
 		{"Reconfigure Device", 	reconfigure_device_menu	},
+		{"Show Registers", 		device_show_registers	},
 		{"Test", 				test 					},
 		{"Reset Device",		reset_chip_bridge  		},
 		{"Make a memory leak",	mem_leak_test 			},
