@@ -7,12 +7,14 @@ A simple menu system in C which can be imported into any project.
 * Allows for submenus to be created in the same way as a normal menu.
 * Puts the terminal back to default settings after use.
 * Quick and Easy to implement
+* Provides a placeholder function for when you what to make a skeleton program. 
+* Provides a quit function.
 
 ![example image](menu_example.png)
 
 ## Usage 
 ### Step 1
-Set up the things you want in your menu by option name and the callback to it's function.
+Set up the things you want in your menu by option name and the callback to it's function. __NB: This must contain the `menu_quit` option!__
 ```c
 struct menu_options menu[] = {
                 {"Exit",                          menu_quit 			},
