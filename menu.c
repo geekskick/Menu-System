@@ -27,7 +27,7 @@ void menu_print(const struct menu_options* const p_menu, const int len, const ch
 }
 
 /**
- * @brief      Gets the height of th current STDOUT console
+ * @brief      Gets the height of the current STDOUT console
  *
  * @return     The number of rows in the console
  */
@@ -73,42 +73,29 @@ void menu_cls(void){
  */
 void menu_loop(const struct menu_options* const p_menu, const int len, const char * const msg, void *chip){
 	int quit_flag = 0;
-	char c;
+	char input[10];
 	while(!quit_flag){
 		menu_print(p_menu, len, msg);
-		scanf(" %c", &c);
+		scanf(" %s", input);
 		//printf("Read a %c[%X]\n", c, c);
-		int idx = atoi(&c);
+		int idx = strtol(input, NULL, 10);
 		if(p_menu[idx].perform == &menu_quit){ p_menu[idx].perform(&quit_flag);}
 		else{ p_menu[idx].perform(chip); }
 	}
 }
 
 /**
- * @brief      This is specifically for selecting a pin and doing something with it.
+ * @brief      Change the foreground colour of the terminal
  *
- * @param[in]  msg   The message to display in the banner
- * @param[in]  fn    The function pointer describing what to do with that pin once selected
- * @param      p     Pointer to the device usually. Will be passed to the first argument of the fn.
+ * @param[in]  new_colour  The new colour
  */
-void menu_pin_selection_submenu(const char * const msg, device_pin_function fn, void* p){
-	char pin;
-	int pin_selection = 1;
-	int function;
-	while(pin_selection){
-		printf("Choose pin, or 'q' to return\n>\t");
-		scanf(" %c", &pin);
-		//printf("Selected %c\n", pin);
+void menu_change_colour(const enum font_colour new_colour){
+	printf("\033[%dm", (int)new_colour);
+}
 
-		if(pin == 'q'){ break; }
-		int pin_i = atoi(&pin);
-		printf("%s on pin %d, or out of limits to ignore:\n", msg, pin_i);
-		for(int f = 0; f < N_FUNCTIONS; f++){
-			printf("%d - %s\n", f, pin_functions[f].text);
-		}
-		scanf(" %d", &function);
-		//printf("Selected %d\n", function);
-		fn(p, pin_i-1, function); 
-	}
-	
+/**
+ * @brief      Resets the colour to default
+ */
+void menu_reset_colour(void){
+	printf("\033[0m");
 }

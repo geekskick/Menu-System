@@ -1,8 +1,8 @@
 DEST_DIR=build
-SRC=main.c menu.c device.c asm.c getch.c hash.c instructions.c
+SRC=main.c menu.c
 CC=gcc
 CFLAGS=-Wall -g -O0
-APP_NAME=sim
+APP_NAME=menu_example
 DBG=lldb
 
 all:

@@ -19,17 +19,22 @@ typedef void (*menu_fn)(void*);
 /**
  * @brief      The menu options have something to display, and something to do when selected.
  */
-struct menu_options {
+struct 	menu_options {
 	char 	*text;
 	menu_fn perform;
 };
 
+/**
+ * @brief      The different menu text colours
+ */
+enum 	font_colour{ black = 30, red, green, yellow, blue, magenta, cyan, white };
 void 	menu_cls(void);
 void 	menu_print(const struct menu_options* const p_menu, const int len, const char * const msg);
 void 	menu_not_implemented(void*);
 void 	menu_quit(void*);
-void 	menu_pin_selection_submenu(const char * const msg, device_pin_function fn, void* p);
 void 	menu_loop(const struct menu_options* const p_menu, const int len, const char * const msg, void *chip);
 int 	menu_get_height(void);
+void 	menu_change_colour(const enum font_colour new_colour);
+void 	menu_reset_colour(void);
 
 #endif //MENU_H
